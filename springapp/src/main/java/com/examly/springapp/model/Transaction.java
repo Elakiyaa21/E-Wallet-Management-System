@@ -3,6 +3,7 @@ package com.examly.springapp.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -12,7 +13,7 @@ public class Transaction {
     @GeneratedValue
     private Long id;
 
-    private double amount;
+    private BigDecimal amount;
     private Date timestamp;
 
     @Enumerated(EnumType.STRING)
@@ -30,12 +31,10 @@ public class Transaction {
     private Wallet destinationWallet;
 
     public enum TransactionType {
-        DEPOSIT,
-        TRANSFER
+        DEPOSIT, TRANSFER
     }
 
     public enum TransactionStatus {
-        SUCCESS,
-        FAILED
+        SUCCESS, FAILED
     }
 }

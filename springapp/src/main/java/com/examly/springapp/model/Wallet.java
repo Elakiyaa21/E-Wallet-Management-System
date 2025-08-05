@@ -1,23 +1,21 @@
 package com.examly.springapp.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Wallet {
     @Id
     @GeneratedValue
     private Long walletId;
 
     private String walletName;
-    private double balance;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal balance;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -10,9 +10,11 @@ import com.examly.springapp.model.Wallet;
 import com.examly.springapp.repository.TransactionRepository;
 import com.examly.springapp.repository.UserRepository;
 import com.examly.springapp.repository.WalletRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
@@ -35,65 +37,65 @@ public class WalletService {
         Wallet wallet = new Wallet();
         wallet.setWalletName(walletName);
         wallet.setUser(user);
-        wallet.setBalance(0.0);
+        wallet.setBalance(BigDecimal.ZERO);
 
         return walletRepository.save(wallet);
     }
 
-    // ✅ Deposit into Wallet
-    public Wallet deposit(Long walletId, double amount) {
-        if (amount <= 0) {
+    // ✅ Deposit
+    public Wallet deposit(Long walletId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Deposit amount must be positive");
         }
 
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
 
-        wallet.setBalance(wallet.getBalance() + amount);
+        wallet.setBalance(wallet.getBalance().add(amount));
         walletRepository.save(wallet);
 
-        Transaction tx = new Transaction();
-        tx.setAmount(amount);
-        tx.setSourceWallet(null);
-        tx.setDestinationWallet(wallet);
-        tx.setTransactionType(TransactionType.DEPOSIT);
-        tx.setStatus(TransactionStatus.SUCCESS);
-        tx.setTimestamp(new Date());
-
-        transactionRepository.save(tx);
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setDestinationWallet(wallet);
+        transaction.setSourceWallet(null);
+        transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setTimestamp(new Date());
+        transactionRepository.save(transaction);
 
         return wallet;
     }
 
-    // ✅ Transfer Money
-    public Transaction transfer(Long sourceId, Long destinationId, double amount) {
+    // ✅ Transfer
+    public Transaction transfer(Long sourceId, Long destinationId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Transfer amount must be positive");
+        }
+
         Wallet source = walletRepository.findById(sourceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Source wallet not found"));
+
         Wallet destination = walletRepository.findById(destinationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
 
-        if (amount <= 0) {
-            throw new BadRequestException("Amount must be positive");
-        }
-
-        if (source.getBalance() < amount) {
+        if (source.getBalance().compareTo(amount) < 0) {
             throw new BadRequestException("Insufficient funds");
         }
 
-        source.setBalance(source.getBalance() - amount);
-        destination.setBalance(destination.getBalance() + amount);
+        source.setBalance(source.getBalance().subtract(amount));
+        destination.setBalance(destination.getBalance().add(amount));
 
         walletRepository.save(source);
         walletRepository.save(destination);
 
-        Transaction tx = new Transaction();
-        tx.setAmount(amount);
-        tx.setSourceWallet(source);
-        tx.setDestinationWallet(destination);
-        tx.setTransactionType(TransactionType.TRANSFER);
-        tx.setStatus(TransactionStatus.SUCCESS);
-        tx.setTimestamp(new Date());
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setSourceWallet(source);
+        transaction.setDestinationWallet(destination);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setTimestamp(new Date());
 
-        return transactionRepository.save(tx);
+        return transactionRepository.save(transaction);
     }
 }
