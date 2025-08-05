@@ -67,10 +67,43 @@ public class WalletService {
     }
 
     // ✅ Transfer
+<<<<<<< HEAD
     // ✅ Transfer
 public Transaction transfer(Long sourceId, Long destinationId, BigDecimal amount) {
     if (amount.compareTo(BigDecimal.ZERO) <= 0) {
         throw new BadRequestException("Transfer amount must be positive");
+=======
+    public Transaction transfer(Long sourceId, Long destinationId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Transfer amount must be positive");
+        }
+
+        Wallet source = walletRepository.findById(sourceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Source wallet not found"));
+
+        Wallet destination = walletRepository.findById(destinationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
+
+        if (source.getBalance().compareTo(amount) < 0) {
+            throw new BadRequestException("Insufficient funds");
+        }
+
+        source.setBalance(source.getBalance().subtract(amount));
+        destination.setBalance(destination.getBalance().add(amount));
+
+        walletRepository.save(source);
+        walletRepository.save(destination);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount.setScale(2));
+        transaction.setSourceWallet(source);
+        transaction.setDestinationWallet(destination);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setTimestamp(new Date());
+
+        return transactionRepository.save(transaction);
+>>>>>>> f1553d071e66ae0c34e0d8863dc20339e7c389d7
     }
 
     Wallet source = walletRepository.findById(sourceId)
