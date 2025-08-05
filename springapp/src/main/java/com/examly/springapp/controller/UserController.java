@@ -15,12 +15,25 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public User createUser(@RequestParam String username, @RequestParam String email) {
-        return userService.createUser(username, email);
+    public User createUser(@RequestParam String name, @RequestParam String email) {
+        return userService.createUser(name, email);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id,
+                           @RequestParam String name,
+                           @RequestParam String email,
+                           @RequestParam String role) {
+        return userService.updateUser(id, name, email, role);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 }

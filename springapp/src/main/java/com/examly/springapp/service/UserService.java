@@ -2,6 +2,7 @@ package com.examly.springapp.service;
 
 import com.examly.springapp.model.User;
 import com.examly.springapp.repository.UserRepository;
+import com.examly.springapp.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(String username, String email) {
+    public User createUser(String name, String email) {
+        if (userRepository.existsByName(name)) {
+            throw new BadRequestException("Username already exists");
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("Email already exists");
+        }
+
         User user = new User();
-        user.setUsername(username);
+        user.setName(name);
         user.setEmail(email);
+        user.setRole("USER");
         return userRepository.save(user);
     }
 
@@ -28,11 +37,12 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User updateUser(Long id, String username, String email) {
+    public User updateUser(Long id, String name, String email, String role) {
         User user = new User();
-        user.setId(id);
-        user.setUsername(username);
+        user.setUserId(id);
+        user.setName(name);
         user.setEmail(email);
-       return userRepository.save(user);
-     }
+        user.setRole(role);
+        return userRepository.save(user);
+    }
 }

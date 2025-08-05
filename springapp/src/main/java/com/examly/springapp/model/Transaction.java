@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +16,7 @@ public class Transaction {
     @GeneratedValue
     private Long transactionId;
 
-    private BigDecimal amount;
+    private Double amount;
     private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)

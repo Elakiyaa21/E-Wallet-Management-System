@@ -6,8 +6,6 @@ import com.examly.springapp.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-
 @RestController
 @RequestMapping("/wallets")
 public class WalletController {
@@ -21,13 +19,14 @@ public class WalletController {
     }
 
     @PutMapping("/{walletId}/deposit")
-    public Wallet deposit(@PathVariable Long walletId, @RequestParam BigDecimal amount) {
+    public Wallet deposit(@PathVariable Long walletId, @RequestParam Double amount) {
         return walletService.deposit(walletId, amount);
     }
 
-    @PostMapping("/{sourceId}/transfer/{destId}")
-    public Transaction transfer(@PathVariable Long sourceId, @PathVariable Long destId,
-                                @RequestParam BigDecimal amount) {
-        return walletService.transfer(sourceId, destId, amount);
+    @PostMapping("/{sourceId}/transfer/{destinationId}")
+    public Transaction transfer(@PathVariable Long sourceId,
+                                 @PathVariable Long destinationId,
+                                 @RequestParam Double amount) {
+        return walletService.transfer(sourceId, destinationId, amount);
     }
 }

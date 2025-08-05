@@ -15,7 +15,7 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping("/wallet/{walletId}")
-    public List<Transaction> getTransactionsByWallet(@PathVariable Long walletId) {
+    public List<Transaction> getTransactions(@PathVariable Long walletId) {
         return transactionService.getTransactionsByWallet(walletId);
     }
 }

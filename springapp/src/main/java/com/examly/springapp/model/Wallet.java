@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -18,7 +17,7 @@ public class Wallet {
     private Long walletId;
 
     private String walletName;
-    private BigDecimal balance;
+    private Double balance;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

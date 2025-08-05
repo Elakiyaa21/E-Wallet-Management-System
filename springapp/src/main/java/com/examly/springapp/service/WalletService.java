@@ -1,17 +1,11 @@
 package com.examly.springapp.service;
 
-import com.examly.springapp.model.Transaction;
-import com.examly.springapp.model.User;
-import com.examly.springapp.model.Wallet;
-import com.examly.springapp.model.Transaction.TransactionStatus;
-import com.examly.springapp.model.Transaction.TransactionType;
-import com.examly.springapp.repository.TransactionRepository;
-import com.examly.springapp.repository.UserRepository;
-import com.examly.springapp.repository.WalletRepository;
+import com.examly.springapp.model.*;
+import com.examly.springapp.repository.*;
+import com.examly.springapp.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -28,59 +22,65 @@ public class WalletService {
     private TransactionRepository transactionRepository;
 
     public Wallet createWallet(Long userId, String walletName) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) return null;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Wallet wallet = new Wallet();
-        wallet.setUser(user.get());
         wallet.setWalletName(walletName);
-        wallet.setBalance(BigDecimal.ZERO);
+        wallet.setBalance(0.0);
+        wallet.setUser(user);
         return walletRepository.save(wallet);
     }
 
-    public Wallet deposit(Long walletId, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) return null;
+    public Wallet deposit(Long walletId, Double amount) {
+        if (amount <= 0) {
+            throw new BadRequestException("Amount must be positive");
+        }
 
-        Optional<Wallet> optionalWallet = walletRepository.findById(walletId);
-        if (optionalWallet.isEmpty()) return null;
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
 
-        Wallet wallet = optionalWallet.get();
-        wallet.setBalance(wallet.getBalance().add(amount));
+        wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
 
-        Transaction tx = new Transaction();
-        tx.setAmount(amount);
-        tx.setType(TransactionType.DEPOSIT);
-        tx.setStatus(TransactionStatus.SUCCESS);
-        tx.setTimestamp(LocalDateTime.now());
-        tx.setDestinationWallet(wallet);
-        transactionRepository.save(tx);
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setType(Transaction.TransactionType.DEPOSIT);
+        transaction.setStatus(Transaction.TransactionStatus.SUCCESS);
+        transaction.setDestinationWallet(wallet);
+        transactionRepository.save(transaction);
 
         return wallet;
     }
 
-    public Transaction transfer(Long sourceId, Long destId, BigDecimal amount) {
-        Optional<Wallet> srcOpt = walletRepository.findById(sourceId);
-        Optional<Wallet> destOpt = walletRepository.findById(destId);
-        if (srcOpt.isEmpty() || destOpt.isEmpty()) return null;
+    public Transaction transfer(Long sourceId, Long destinationId, Double amount) {
+        if (amount <= 0) {
+            throw new BadRequestException("Amount must be positive");
+        }
 
-        Wallet src = srcOpt.get();
-        Wallet dest = destOpt.get();
+        Wallet source = walletRepository.findById(sourceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Source wallet not found"));
 
-        if (src.getBalance().compareTo(amount) < 0 || amount.compareTo(BigDecimal.ZERO) <= 0) return null;
+        Wallet destination = walletRepository.findById(destinationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
 
-        src.setBalance(src.getBalance().subtract(amount));
-        dest.setBalance(dest.getBalance().add(amount));
-        walletRepository.save(src);
-        walletRepository.save(dest);
+        if (source.getBalance() < amount) {
+            throw new BadRequestException("Insufficient balance");
+        }
 
-        Transaction tx = new Transaction();
-        tx.setAmount(amount);
-        tx.setSourceWallet(src);
-        tx.setDestinationWallet(dest);
-        tx.setTimestamp(LocalDateTime.now());
-        tx.setType(TransactionType.TRANSFER);
-        tx.setStatus(TransactionStatus.SUCCESS);
-        return transactionRepository.save(tx);
+        source.setBalance(source.getBalance() - amount);
+        destination.setBalance(destination.getBalance() + amount);
+        walletRepository.save(source);
+        walletRepository.save(destination);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setType(Transaction.TransactionType.TRANSFER);
+        transaction.setStatus(Transaction.TransactionStatus.SUCCESS);
+        transaction.setSourceWallet(source);
+        transaction.setDestinationWallet(destination);
+        return transactionRepository.save(transaction);
     }
 }
