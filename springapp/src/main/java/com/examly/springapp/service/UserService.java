@@ -13,11 +13,10 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(String name, String email) {
+    public User createUser(String username, String email) {
         User user = new User();
-        user.setName(name);
+        user.setUsername(username);
         user.setEmail(email);
-        user.setRole("USER"); // default role
         return userRepository.save(user);
     }
 
@@ -29,12 +28,11 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User updateUser(Long id, String name, String email, String role) {
+    public User updateUser(Long id, String username, String email) {
         User user = new User();
         user.setId(id);
-        user.setName(name);
+        user.setUsername(username);
         user.setEmail(email);
-        user.setRole(role);
         return userRepository.save(user);
     }
 }

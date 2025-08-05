@@ -15,8 +15,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public User createUser(@RequestParam String name, @RequestParam String email) {
-        return userService.createUser(name, email);
+    public User createUser(@RequestParam String username, @RequestParam String email) {
+        return userService.createUser(username, email);
     }
 
     @GetMapping
