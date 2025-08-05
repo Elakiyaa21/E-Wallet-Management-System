@@ -15,7 +15,8 @@ public class User {
     @Id
     @GeneratedValue
     private long userId;
+
     private String email;
-    private String name;
+    private String username;
     private String role;
 }

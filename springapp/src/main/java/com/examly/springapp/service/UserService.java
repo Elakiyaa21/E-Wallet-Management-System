@@ -13,8 +13,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(String name, String email) {
-        if (userRepository.existsByName(name)) {
+    public User createUser(String username, String email) {
+        if (userRepository.existsByUsername(username)) {
             throw new BadRequestException("Username already exists");
         }
         if (userRepository.existsByEmail(email)) {
@@ -22,7 +22,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setName(name);
+        user.setUsername(username); // ✅ match test case
         user.setEmail(email);
         user.setRole("USER");
         return userRepository.save(user);
