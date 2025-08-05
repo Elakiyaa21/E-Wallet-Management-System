@@ -1,41 +1,41 @@
 package com.examly.springapp.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Transaction {
-    public enum TransactionType {
-        DEPOSIT, TRANSFER
-    }
-
-    public enum TransactionStatus {
-        SUCCESS, FAILED
-    }
-
     @Id
     @GeneratedValue
-    private Long transactionId;
+    private Long id;
 
     private double amount;
-    private LocalDateTime timestamp;
+    private Date timestamp;
 
     @Enumerated(EnumType.STRING)
-    private TransactionType type;
+    private TransactionType transactionType;
 
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
     @ManyToOne
+    @JoinColumn(name = "source_wallet_id")
     private Wallet sourceWallet;
 
     @ManyToOne
+    @JoinColumn(name = "destination_wallet_id")
     private Wallet destinationWallet;
+
+    public enum TransactionType {
+        DEPOSIT,
+        TRANSFER
+    }
+
+    public enum TransactionStatus {
+        SUCCESS,
+        FAILED
+    }
 }

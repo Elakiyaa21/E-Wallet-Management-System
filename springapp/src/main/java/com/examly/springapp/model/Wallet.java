@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class Wallet {
     @Id
     @GeneratedValue
@@ -22,10 +22,4 @@ public class Wallet {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "sourceWallet", cascade = CascadeType.ALL)
-    private List<Transaction> outgoingTransactions;
-
-    @OneToMany(mappedBy = "destinationWallet", cascade = CascadeType.ALL)
-    private List<Transaction> incomingTransactions;
 }
