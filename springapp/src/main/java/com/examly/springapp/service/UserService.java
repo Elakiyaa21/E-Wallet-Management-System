@@ -22,7 +22,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setUsername(username); // ✅ match test case
+        user.setUsername(username); 
         user.setEmail(email);
         user.setRole("USER");
         return userRepository.save(user);

@@ -16,19 +16,16 @@ public class WalletController {
     @Autowired
     private WalletService walletService;
 
-    // ✅ Create a new wallet for a user
     @PostMapping
     public Wallet createWallet(@RequestParam Long userId, @RequestParam String walletName) {
         return walletService.createWallet(userId, walletName);
     }
 
-    // ✅ Deposit money into wallet
     @PostMapping("/{walletId}/deposit")
     public Wallet deposit(@PathVariable Long walletId, @RequestParam BigDecimal amount) {
         return walletService.deposit(walletId, amount);
     }
 
-    // ✅ Transfer money from one wallet to another
     @PostMapping("/transfer")
     public Transaction transfer(@RequestParam Long sourceId,
                                 @RequestParam Long destinationId,

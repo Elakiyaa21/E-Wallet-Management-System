@@ -29,7 +29,6 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Create Wallet
     public Wallet createWallet(Long userId, String walletName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -42,7 +41,6 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    // ✅ Deposit
     public Wallet deposit(Long walletId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Deposit amount must be positive");
@@ -66,7 +64,6 @@ public class WalletService {
         return wallet;
     }
 
-    // ✅ Transfer
     public Transaction transfer(Long sourceId, Long destinationId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Transfer amount must be positive");
