@@ -30,16 +30,17 @@ public class WalletService {
     private UserRepository userRepository;
 
     public Wallet createWallet(Long userId, String walletName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Wallet wallet = new Wallet();
-        wallet.setWalletName(walletName);
-        wallet.setUser(user);
-        wallet.setBalance(BigDecimal.ZERO);
+    Wallet wallet = new Wallet();
+    wallet.setWalletName(walletName);
+    wallet.setUser(user); // VERY IMPORTANT: use the same instance
+    wallet.setBalance(BigDecimal.ZERO);
 
-        return walletRepository.save(wallet);
-    }
+    return walletRepository.save(wallet);
+}
+
 
     public Wallet deposit(Long walletId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
