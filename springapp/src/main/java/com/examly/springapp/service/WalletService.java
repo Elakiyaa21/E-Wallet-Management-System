@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 @Service
@@ -89,7 +90,7 @@ public class WalletService {
         walletRepository.save(destination);
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(amount.setScale(2));
+        transaction.setAmount(new BigDecimal(String.format("%.2f", amount)));
         transaction.setSourceWallet(source);
         transaction.setDestinationWallet(destination);
         transaction.setTransactionType(TransactionType.TRANSFER);
