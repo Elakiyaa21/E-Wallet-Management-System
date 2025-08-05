@@ -1,9 +1,9 @@
 package com.examly.springapp.repository;
 
+import com.examly.springapp.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.examly.springapp.model.User;
-
-public interface UserRepository extends JpaRepository<User, Long>{
-    
+public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsByName(String name);
+    boolean existsByEmail(String email);
 }
