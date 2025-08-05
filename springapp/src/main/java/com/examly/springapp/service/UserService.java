@@ -33,6 +33,6 @@ public class UserService {
         user.setId(id);
         user.setUsername(username);
         user.setEmail(email);
-        return userRepository.save(user);
-    }
+       return userRepository.save(user);
+     }
 }
