@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class WalletService {
@@ -29,19 +30,20 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
+    
     public Wallet createWallet(Long userId, String walletName) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-    Wallet wallet = new Wallet();
-    wallet.setWalletName(walletName);
-    wallet.setUser(user); // VERY IMPORTANT: use the same instance
-    wallet.setBalance(BigDecimal.ZERO);
+        Wallet wallet = new Wallet();
+        wallet.setWalletName(walletName);
+        wallet.setUser(user);
+        wallet.setBalance(BigDecimal.ZERO);
 
-    return walletRepository.save(wallet);
-}
+        return walletRepository.save(wallet);
+    }
 
-
+    
     public Wallet deposit(Long walletId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Deposit amount must be positive");
@@ -65,6 +67,7 @@ public class WalletService {
         return wallet;
     }
 
+    
     public Transaction transfer(Long sourceId, Long destinationId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Transfer amount must be positive");
@@ -95,5 +98,31 @@ public class WalletService {
         transaction.setTimestamp(new Date());
 
         return transactionRepository.save(transaction);
+    }
+
+    
+    public List<Wallet> getAllWallets() {
+        return walletRepository.findAll();
+    }
+
+    
+    public Wallet getWalletById(Long id) {
+        return walletRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+    }
+
+    
+    public Wallet updateWalletName(Long id, String newName) {
+        Wallet wallet = walletRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+        wallet.setWalletName(newName);
+        return walletRepository.save(wallet);
+    }
+
+    
+    public void deleteWallet(Long id) {
+        Wallet wallet = walletRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+        walletRepository.delete(wallet);
     }
 }
