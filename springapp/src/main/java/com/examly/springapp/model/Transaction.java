@@ -1,11 +1,12 @@
 package com.examly.springapp.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -13,6 +14,31 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Transaction {
     @Id
-    @GeneratedValue()
-    long userId;
+    @GeneratedValue
+    private Long transactionId;
+
+    private BigDecimal amount;
+    private LocalDateTime timestamp;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "source_wallet_id")
+    private Wallet sourceWallet;
+
+    @ManyToOne
+    @JoinColumn(name = "destination_wallet_id")
+    private Wallet destinationWallet;
+
+    public enum TransactionType {
+        DEPOSIT, TRANSFER
+    }
+
+    public enum TransactionStatus {
+        SUCCESS, FAILED
+    }
 }
