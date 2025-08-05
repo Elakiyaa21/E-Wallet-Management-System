@@ -1,10 +1,10 @@
 package com.examly.springapp.service;
 
+import com.examly.springapp.exception.ResourceNotFoundException;
 import com.examly.springapp.model.Transaction;
 import com.examly.springapp.model.Wallet;
 import com.examly.springapp.repository.TransactionRepository;
 import com.examly.springapp.repository.WalletRepository;
-import com.examly.springapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

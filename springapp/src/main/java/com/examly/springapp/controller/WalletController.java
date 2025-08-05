@@ -1,7 +1,7 @@
 package com.examly.springapp.controller;
 
-import com.examly.springapp.model.Transaction;
 import com.examly.springapp.model.Wallet;
+import com.examly.springapp.model.Transaction;
 import com.examly.springapp.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +13,20 @@ public class WalletController {
     @Autowired
     private WalletService walletService;
 
-    @PostMapping("/{userId}")
-    public Wallet createWallet(@PathVariable Long userId, @RequestParam String walletName) {
+    @PostMapping
+    public Wallet createWallet(@RequestParam Long userId, @RequestParam String walletName) {
         return walletService.createWallet(userId, walletName);
     }
 
-    @PutMapping("/{walletId}/deposit")
-    public Wallet deposit(@PathVariable Long walletId, @RequestParam Double amount) {
+    @PostMapping("/{walletId}/deposit")
+    public Wallet deposit(@PathVariable Long walletId, @RequestParam double amount) {
         return walletService.deposit(walletId, amount);
     }
 
-    @PostMapping("/{sourceId}/transfer/{destinationId}")
-    public Transaction transfer(@PathVariable Long sourceId,
-                                 @PathVariable Long destinationId,
-                                 @RequestParam Double amount) {
+    @PostMapping("/transfer")
+    public Transaction transfer(@RequestParam Long sourceId,
+                                 @RequestParam Long destinationId,
+                                 @RequestParam double amount) {
         return walletService.transfer(sourceId, destinationId, amount);
     }
 }

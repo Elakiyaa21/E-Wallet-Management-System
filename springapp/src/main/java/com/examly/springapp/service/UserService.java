@@ -10,7 +10,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
 
@@ -35,14 +34,5 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-    }
-
-    public User updateUser(Long id, String name, String email, String role) {
-        User user = new User();
-        user.setUserId(id);
-        user.setName(name);
-        user.setEmail(email);
-        user.setRole(role);
-        return userRepository.save(user);
     }
 }

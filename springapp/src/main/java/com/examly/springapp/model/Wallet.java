@@ -8,16 +8,16 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Wallet {
     @Id
     @GeneratedValue
     private Long walletId;
 
     private String walletName;
-    private Double balance;
+    private double balance;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

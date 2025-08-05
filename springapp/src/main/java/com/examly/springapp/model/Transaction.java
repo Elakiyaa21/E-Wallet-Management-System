@@ -12,11 +12,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
+    public enum TransactionType {
+        DEPOSIT, TRANSFER
+    }
+
+    public enum TransactionStatus {
+        SUCCESS, FAILED
+    }
+
     @Id
     @GeneratedValue
     private Long transactionId;
 
-    private Double amount;
+    private double amount;
     private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
@@ -26,18 +34,8 @@ public class Transaction {
     private TransactionStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "source_wallet_id")
     private Wallet sourceWallet;
 
     @ManyToOne
-    @JoinColumn(name = "destination_wallet_id")
     private Wallet destinationWallet;
-
-    public enum TransactionType {
-        DEPOSIT, TRANSFER
-    }
-
-    public enum TransactionStatus {
-        SUCCESS, FAILED
-    }
 }

@@ -1,13 +1,17 @@
 package com.examly.springapp.service;
 
-import com.examly.springapp.model.*;
-import com.examly.springapp.repository.*;
-import com.examly.springapp.exception.*;
+import com.examly.springapp.exception.BadRequestException;
+import com.examly.springapp.exception.ResourceNotFoundException;
+import com.examly.springapp.model.Transaction;
+import com.examly.springapp.model.User;
+import com.examly.springapp.model.Wallet;
+import com.examly.springapp.repository.TransactionRepository;
+import com.examly.springapp.repository.UserRepository;
+import com.examly.springapp.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class WalletService {
@@ -32,9 +36,9 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    public Wallet deposit(Long walletId, Double amount) {
+    public Wallet deposit(Long walletId, double amount) {
         if (amount <= 0) {
-            throw new BadRequestException("Amount must be positive");
+            throw new BadRequestException("Amount must be greater than 0");
         }
 
         Wallet wallet = walletRepository.findById(walletId)
@@ -43,20 +47,20 @@ public class WalletService {
         wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
 
-        Transaction transaction = new Transaction();
-        transaction.setAmount(amount);
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setType(Transaction.TransactionType.DEPOSIT);
-        transaction.setStatus(Transaction.TransactionStatus.SUCCESS);
-        transaction.setDestinationWallet(wallet);
-        transactionRepository.save(transaction);
+        Transaction tx = new Transaction();
+        tx.setAmount(amount);
+        tx.setTimestamp(LocalDateTime.now());
+        tx.setType(Transaction.TransactionType.DEPOSIT);
+        tx.setStatus(Transaction.TransactionStatus.SUCCESS);
+        tx.setDestinationWallet(wallet);
+        transactionRepository.save(tx);
 
         return wallet;
     }
 
-    public Transaction transfer(Long sourceId, Long destinationId, Double amount) {
+    public Transaction transfer(Long sourceId, Long destinationId, double amount) {
         if (amount <= 0) {
-            throw new BadRequestException("Amount must be positive");
+            throw new BadRequestException("Amount must be greater than 0");
         }
 
         Wallet source = walletRepository.findById(sourceId)
@@ -66,7 +70,7 @@ public class WalletService {
                 .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
 
         if (source.getBalance() < amount) {
-            throw new BadRequestException("Insufficient balance");
+            throw new BadRequestException("Insufficient funds");
         }
 
         source.setBalance(source.getBalance() - amount);
@@ -74,13 +78,14 @@ public class WalletService {
         walletRepository.save(source);
         walletRepository.save(destination);
 
-        Transaction transaction = new Transaction();
-        transaction.setAmount(amount);
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setType(Transaction.TransactionType.TRANSFER);
-        transaction.setStatus(Transaction.TransactionStatus.SUCCESS);
-        transaction.setSourceWallet(source);
-        transaction.setDestinationWallet(destination);
-        return transactionRepository.save(transaction);
+        Transaction tx = new Transaction();
+        tx.setAmount(amount);
+        tx.setTimestamp(LocalDateTime.now());
+        tx.setType(Transaction.TransactionType.TRANSFER);
+        tx.setStatus(Transaction.TransactionStatus.SUCCESS);
+        tx.setSourceWallet(source);
+        tx.setDestinationWallet(destination);
+
+        return transactionRepository.save(tx);
     }
 }

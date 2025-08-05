@@ -24,14 +24,6 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id,
-                           @RequestParam String name,
-                           @RequestParam String email,
-                           @RequestParam String role) {
-        return userService.updateUser(id, name, email, role);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
