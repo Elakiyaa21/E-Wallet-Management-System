@@ -10,11 +10,11 @@ import com.examly.springapp.model.Wallet;
 import com.examly.springapp.repository.TransactionRepository;
 import com.examly.springapp.repository.UserRepository;
 import com.examly.springapp.repository.WalletRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
 
 @Service
@@ -37,7 +37,7 @@ public class WalletService {
         Wallet wallet = new Wallet();
         wallet.setWalletName(walletName);
         wallet.setUser(user);
-        wallet.setBalance(BigDecimal.ZERO.setScale(2));
+        wallet.setBalance(BigDecimal.ZERO);
 
         return walletRepository.save(wallet);
     }
@@ -51,12 +51,11 @@ public class WalletService {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
 
-        BigDecimal depositAmount = amount.setScale(2, RoundingMode.HALF_UP);
-        wallet.setBalance(wallet.getBalance().add(depositAmount));
+        wallet.setBalance(wallet.getBalance().add(amount));
         walletRepository.save(wallet);
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(depositAmount);
+        transaction.setAmount(amount);
         transaction.setDestinationWallet(wallet);
         transaction.setSourceWallet(null);
         transaction.setTransactionType(TransactionType.DEPOSIT);
@@ -79,20 +78,18 @@ public class WalletService {
         Wallet destination = walletRepository.findById(destinationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
 
-        BigDecimal transferAmount = amount.setScale(2, RoundingMode.HALF_UP);
-
-        if (source.getBalance().compareTo(transferAmount) < 0) {
+        if (source.getBalance().compareTo(amount) < 0) {
             throw new BadRequestException("Insufficient funds");
         }
 
-        source.setBalance(source.getBalance().subtract(transferAmount));
-        destination.setBalance(destination.getBalance().add(transferAmount));
+        source.setBalance(source.getBalance().subtract(amount));
+        destination.setBalance(destination.getBalance().add(amount));
 
         walletRepository.save(source);
         walletRepository.save(destination);
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(transferAmount); // fixed scale to match test
+        transaction.setAmount(amount);
         transaction.setSourceWallet(source);
         transaction.setDestinationWallet(destination);
         transaction.setTransactionType(TransactionType.TRANSFER);
