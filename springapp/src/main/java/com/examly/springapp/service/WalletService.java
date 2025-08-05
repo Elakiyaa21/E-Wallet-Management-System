@@ -89,7 +89,7 @@ public class WalletService {
         walletRepository.save(destination);
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(amount);
+        transaction.setAmount(amount.setScale(2));
         transaction.setSourceWallet(source);
         transaction.setDestinationWallet(destination);
         transaction.setTransactionType(TransactionType.TRANSFER);
