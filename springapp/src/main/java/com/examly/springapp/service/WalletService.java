@@ -98,8 +98,11 @@ public class WalletService {
         transaction.setTransactionType(TransactionType.TRANSFER);
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setTimestamp(new Date());
-
-        return transactionRepository.save(transaction);
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        if(savedTransaction == null){
+            return transaction;
+        }
+        return savedTransaction;
     }
 
     
