@@ -30,7 +30,6 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
-    
     public Wallet createWallet(Long userId, String walletName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -88,10 +87,10 @@ public class WalletService {
         destination.setBalance(destination.getBalance().add(amount));
 
         
-        walletRepository.save(source);        // mocked in test
-        walletRepository.save(destination);   // mocked in test
+        walletRepository.save(source);        
+        walletRepository.save(destination);   
 
-        
+       
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
         transaction.setSourceWallet(source);
@@ -108,7 +107,7 @@ public class WalletService {
         return walletRepository.findAll();
     }
 
-    
+  
     public Wallet getWalletById(Long id) {
         return walletRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
@@ -122,7 +121,6 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    
     public void deleteWallet(Long id) {
         Wallet wallet = walletRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
