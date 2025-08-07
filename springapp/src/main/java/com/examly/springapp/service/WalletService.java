@@ -30,7 +30,6 @@ public class WalletService {
     @Autowired
     private UserRepository userRepository;
 
-
     public Wallet createWallet(Long userId, String walletName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -99,9 +98,11 @@ public class WalletService {
         transaction.setTransactionType(TransactionType.TRANSFER);
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setTimestamp(new Date());
-
-        return transactionRepository.save(transaction);
-        
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        if(savedTransaction == null){
+            return transaction;
+        }
+        return savedTransaction;
     }
 
     
@@ -122,7 +123,6 @@ public class WalletService {
         wallet.setWalletName(newName);
         return walletRepository.save(wallet);
     }
-
 
     public void deleteWallet(Long id) {
         Wallet wallet = walletRepository.findById(id)
