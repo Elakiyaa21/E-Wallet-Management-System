@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { depositFunds } from '../utils/api';
 
-const DepositForm = ({ wallets, onDeposit }) => {
+const DepositForm = ({ wallets = [], onDeposit }) => {
   const [walletId, setWalletId] = useState('');
   const [amount, setAmount] = useState('');
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
     setError('');
+    setSuccess('');
 
     if (!walletId) {
       setError('Wallet must be selected');
@@ -23,46 +23,50 @@ const DepositForm = ({ wallets, onDeposit }) => {
     }
 
     try {
-      const data = await depositFunds(walletId, amount);
-      onDeposit && onDeposit(data);
-      setMessage('Deposit successful');
-      setWalletId('');
+      const response = await depositFunds(walletId, Number(amount));
+      if (onDeposit) onDeposit(response);
+      setSuccess('Deposit successful');
       setAmount('');
+      setWalletId('');
     } catch (err) {
-      setError('Failed to deposit');
+      setError('Deposit failed');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="wallet">Wallet</label>
-      <select
-        id="wallet"
-        data-testid="wallet-select"
-        value={walletId}
-        onChange={(e) => setWalletId(e.target.value)}
-      >
-        <option value="">-- Select Wallet --</option>
-        {wallets.map((wallet) => (
-          <option key={wallet.walletId} value={wallet.walletId}>
-            {wallet.walletName}
-          </option>
-        ))}
-      </select>
+      <div>
+        <label htmlFor="wallet">Wallet:</label>
+        <select
+          id="wallet"
+          data-testid="wallet-select"
+          value={walletId}
+          onChange={(e) => setWalletId(e.target.value)}
+        >
+          <option value="">Select Wallet</option>
+          {wallets.map((w) => (
+            <option key={w.walletId} value={w.walletId}>
+              {w.walletName} (Balance: ₹{w.balance})
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <label htmlFor="amount">Amount</label>
-      <input
-        type="number"
-        id="amount"
-        data-testid="deposit-amount-input"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
+      <div>
+        <label htmlFor="amount">Amount:</label>
+        <input
+          type="number"
+          id="amount"
+          data-testid="deposit-amount-input"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </div>
 
       <button type="submit">Deposit</button>
 
-      {error && <p data-testid="deposit-form-error">{error}</p>}
-      {message && <p data-testid="deposit-form-success">{message}</p>}
+      {error && <div data-testid="deposit-form-error" style={{ color: 'red' }}>{error}</div>}
+      {success && <div data-testid="deposit-form-success" style={{ color: 'green' }}>{success}</div>}
     </form>
   );
 };

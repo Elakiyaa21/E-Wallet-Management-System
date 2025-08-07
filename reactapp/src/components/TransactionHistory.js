@@ -7,30 +7,36 @@ const TransactionHistory = ({ walletId }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!walletId) return;
+
       try {
-        const data = await getTransactionHistory(walletId);
-        setTransactions(data);
+        const txs = await getTransactionHistory(walletId);
+        setTransactions(txs);
       } catch (err) {
-        setTransactions([]);
+        console.error('Failed to load transactions', err);
       }
     };
+
     fetchData();
   }, [walletId]);
 
   return (
     <div data-testid="transaction-history">
-      {walletId && transactions.length > 0 ? (
+      {!walletId ? (
+        <p>No transactions available</p>
+      ) : transactions.length === 0 ? (
+        <p>Loading transactions...</p>
+      ) : (
         <ul>
           {transactions.map((tx) => (
             <li key={tx.transactionId} data-testid={`tx-${tx.transactionId}`}>
-              <p>{tx.transactionType}</p>
-              <p>{tx.amount}</p>
-              <p>{tx.status}</p>
+              <strong>{tx.transactionType}</strong> of ₹{tx.amount} - Status: {tx.status} <br />
+              {tx.sourceWallet && <span>From: {tx.sourceWallet.walletName} </span>}
+              {tx.destinationWallet && <span>To: {tx.destinationWallet.walletName} </span>}
+              <br />
+              <small>{new Date(tx.timestamp).toLocaleString()}</small>
             </li>
           ))}
         </ul>
-      ) : (
-        <p>No transactions</p>
       )}
     </div>
   );
