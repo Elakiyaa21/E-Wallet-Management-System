@@ -2,33 +2,37 @@ import React, { useState } from 'react';
 import { transferFunds } from '../utils/api';
 
 const TransferForm = ({ wallets, onTransfer }) => {
-  const [sourceWalletId, setSourceWalletId] = useState('');
-  const [destinationWalletId, setDestinationWalletId] = useState('');
+  const [sourceId, setSourceId] = useState('');
+  const [destId, setDestId] = useState('');
   const [amount, setAmount] = useState('');
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setMessage('');
+    setSuccess('');
 
-    if (!sourceWalletId || !destinationWalletId || !amount) {
-      setError('All fields are required');
+    if (!sourceId || !destId || !amount) {
+      setError('Please select source wallet, destination wallet, and enter an amount');
       return;
     }
 
-    if (sourceWalletId === destinationWalletId) {
-      setError('Source and destination wallets must differ');
+    if (sourceId === destId) {
+      setError('Source and destination wallets must be different');
       return;
     }
 
     try {
-      const data = await transferFunds(sourceWalletId, destinationWalletId, amount);
-      onTransfer && onTransfer(data);
-      setMessage('Transfer successful');
-      setSourceWalletId('');
-      setDestinationWalletId('');
+      const transfer = await transferFunds({
+        sourceWalletId: parseInt(sourceId),
+        destinationWalletId: parseInt(destId),
+        amount: parseFloat(amount),
+      });
+      if (onTransfer) onTransfer(transfer);
+      setSuccess('Transfer successful');
+      setSourceId('');
+      setDestId('');
       setAmount('');
     } catch (err) {
       setError('Transfer failed');
@@ -37,42 +41,54 @@ const TransferForm = ({ wallets, onTransfer }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>From Wallet</label>
-      <select
-        data-testid="source-wallet"
-        value={sourceWalletId}
-        onChange={(e) => setSourceWalletId(e.target.value)}
-      >
-        <option value="">--Select--</option>
-        {wallets.map((w) => (
-          <option key={w.walletId} value={w.walletId}>{w.walletName}</option>
-        ))}
-      </select>
+      <div>
+        <label htmlFor="source">Source Wallet</label>
+        <select
+          data-testid="source-wallet-select"
+          id="source"
+          value={sourceId}
+          onChange={(e) => setSourceId(e.target.value)}
+        >
+          <option value="">Select Wallet</option>
+          {wallets.map(w => (
+            <option key={w.walletId} value={w.walletId}>
+              {w.walletName}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <label>To Wallet</label>
-      <select
-        data-testid="destination-wallet"
-        value={destinationWalletId}
-        onChange={(e) => setDestinationWalletId(e.target.value)}
-      >
-        <option value="">--Select--</option>
-        {wallets.map((w) => (
-          <option key={w.walletId} value={w.walletId}>{w.walletName}</option>
-        ))}
-      </select>
+      <div>
+        <label htmlFor="destination">Destination Wallet</label>
+        <select
+          data-testid="destination-wallet-select"
+          id="destination"
+          value={destId}
+          onChange={(e) => setDestId(e.target.value)}
+        >
+          <option value="">Select Wallet</option>
+          {wallets.map(w => (
+            <option key={w.walletId} value={w.walletId}>
+              {w.walletName}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <label>Amount</label>
-      <input
-        type="number"
-        data-testid="transfer-amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
+      <div>
+        <label htmlFor="amount">Amount</label>
+        <input
+          data-testid="transfer-amount-input"
+          id="amount"
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </div>
 
       <button type="submit">Transfer</button>
-
-      {error && <p data-testid="transfer-form-error">{error}</p>}
-      {message && <p data-testid="transfer-form-success">{message}</p>}
+      {error && <div data-testid="transfer-form-error">{error}</div>}
+      {success && <div data-testid="transfer-form-success">{success}</div>}
     </form>
   );
 };

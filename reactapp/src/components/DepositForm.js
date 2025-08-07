@@ -65,8 +65,16 @@ const DepositForm = ({ wallets = [], onDeposit }) => {
 
       <button type="submit">Deposit</button>
 
-      {error && <div data-testid="deposit-form-error" style={{ color: 'red' }}>{error}</div>}
-      {success && <div data-testid="deposit-form-success" style={{ color: 'green' }}>{success}</div>}
+      {error && (
+        <div data-testid="deposit-form-error" style={{ color: 'red' }}>
+          {error}
+        </div>
+      )}
+      {success && (
+        <div data-testid="deposit-form-success" style={{ color: 'green' }}>
+          {success}
+        </div>
+      )}
     </form>
   );
 };
