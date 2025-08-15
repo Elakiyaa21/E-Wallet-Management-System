@@ -30,7 +30,8 @@ public class TransactionService {
 
     
     public Transaction createTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+        return saved != null ? saved : transaction;
     }
 
     
@@ -56,8 +57,8 @@ public class TransactionService {
         existing.setSourceWallet(updatedTransaction.getSourceWallet());
         existing.setDestinationWallet(updatedTransaction.getDestinationWallet());
 
-        return transactionRepository.save(existing);
-    }
+        Transaction saved = transactionRepository.save(existing);
+        return saved != null ? saved : existing;    }
 
     
     public void deleteTransaction(Long id) {
