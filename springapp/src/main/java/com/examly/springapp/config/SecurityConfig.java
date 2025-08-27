@@ -70,7 +70,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins:http://localhost:8081, https://e-wallet-management-system-flax.vercel.app}") String allowedOrigin) {
+    CorsConfigurationSource corsConfigurationSource(
+                    @Value("${app.cors.allowed-origins}") String allowedOrigin) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(allowedOrigin));
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
