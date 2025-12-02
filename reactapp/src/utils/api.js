@@ -1,7 +1,6 @@
 import axios from "axios";
 
-// const BASE_URL = process.env.REACT_APP_API_BASE || "http://localhost:8080";
-const BASE_URL = "https://e-wallet-management-system.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
 const API = axios.create({ baseURL: BASE_URL });
 
